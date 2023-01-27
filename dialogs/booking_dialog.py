@@ -53,7 +53,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Prompt for destination."""
         booking_details = step_context.options
 
-        if booking_details.destination is None:
+        if booking_details.dst_city is None:
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
@@ -61,15 +61,15 @@ class BookingDialog(CancelAndHelpDialog):
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
-        return await step_context.next(booking_details.destination)
+        return await step_context.next(booking_details.dst_city)
 
     async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Prompt for origin city."""
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
-        booking_details.destination = step_context.result
-        if booking_details.origin is None:
+        booking_details.dst_city = step_context.result
+        if booking_details.or_city is None:
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
@@ -77,7 +77,7 @@ class BookingDialog(CancelAndHelpDialog):
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
-        return await step_context.next(booking_details.origin)
+        return await step_context.next(booking_details.or_city)
 
     async def travel_date_step(
         self, step_context: WaterfallStepContext
@@ -88,7 +88,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details = step_context.options
 
         # Capture the results of the previous step
-        booking_details.origin = step_context.result
+        booking_details.or_city = step_context.result
         if not booking_details.travel_date or self.is_ambiguous(
             booking_details.travel_date
         ):
@@ -107,8 +107,8 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.travel_date = step_context.result
         msg = (
-            f"Please confirm, I have you traveling to: { booking_details.destination }"
-            f" from: { booking_details.origin } on: { booking_details.travel_date}."
+            f"Please confirm, I have you traveling to: { booking_details.dst_city }"
+            f" from: { booking_details.or_city } on: { booking_details.travel_date}."
         )
 
         # Offer a YES/NO prompt.
