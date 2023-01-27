@@ -90,14 +90,14 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.or_city = step_context.result # origin
-        if not booking_details.travel_date or self.is_ambiguous(
-            booking_details.travel_date
+        if not booking_details.str_date or self.is_ambiguous(
+            booking_details.str_date # travel_date
         ):
             return await step_context.begin_dialog(
-                DateResolverDialog.__name__, booking_details.travel_date
+                DateResolverDialog.__name__, booking_details.str_date # travel_date
             )  # pylint: disable=line-too-long
 
-        return await step_context.next(booking_details.travel_date)
+        return await step_context.next(booking_details.str_date) # travel_date
 
     async def confirm_step(
         self, step_context: WaterfallStepContext
@@ -106,10 +106,10 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details = step_context.options
 
         # Capture the results of the previous step
-        booking_details.travel_date = step_context.result
+        booking_details.str_date = step_context.result # travel_date
         msg = (
-            f"Please confirm, I have you traveling to: { booking_details.dst_city }"
-            f" from: { booking_details.or_city } on: { booking_details.travel_date}."
+            f"Please confirm, I have you traveling to: { booking_details.dst_city }" # destination
+            f" from: { booking_details.or_city } on: { booking_details.str_date}." # travel_date
         )
 
         # Offer a YES/NO prompt.
@@ -121,7 +121,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Complete the interaction and end the dialog."""
         if step_context.result:
             booking_details = step_context.options
-            booking_details.travel_date = step_context.result
+            booking_details.str_date = step_context.result # travel_date
 
             return await step_context.end_dialog(booking_details)
 
