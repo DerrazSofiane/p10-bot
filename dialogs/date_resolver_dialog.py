@@ -3,6 +3,7 @@
 """Handle date/time resolution for booking dialog."""
 
 from datatypes_date_time.timex import Timex
+from typing import Final
 
 from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryClient
 from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepContext
@@ -17,7 +18,10 @@ from .cancel_and_help_dialog import CancelAndHelpDialog
 
 class DateResolverDialog(CancelAndHelpDialog):
     """Resolve the date"""
-
+    
+    START_DATE_DIALOG_ID: Final[str] = "StartDateDialog"
+    END_DATE_DIALOG_ID: Final[str] = "EndDateDialog"
+    
     def __init__(
         self,
         dialog_id: str = None,
@@ -39,6 +43,7 @@ class DateResolverDialog(CancelAndHelpDialog):
         waterfall_dialog.telemetry_client = telemetry_client
 
         self.add_dialog(date_time_prompt)
+        self._dialog_id = dialog_id
         self.add_dialog(waterfall_dialog)
 
         self.initial_dialog_id = WaterfallDialog.__name__ + "2"
@@ -48,8 +53,14 @@ class DateResolverDialog(CancelAndHelpDialog):
     ) -> DialogTurnResult:
         """Prompt for the date."""
         timex = step_context.options
-
-        prompt_msg = "On what date would you like to travel?"
+        
+        if self._dialog_id == DateResolverDialog.START_DATE_DIALOG_ID:
+            prompt_msg = "When do you want to leave 🥳 ?"
+        elif self._dialog_id == DateResolverDialog.END_DATE_DIALOG_ID:
+            prompt_msg = "When will you be coming back 😮‍💨 ?"
+        else:
+            prompt_msg = "On what date would you like to travel?"
+            
         reprompt_msg = (
             "I'm sorry, for best results, please enter your travel "
             "date including the month, day and year."
