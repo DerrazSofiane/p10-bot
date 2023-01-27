@@ -32,7 +32,8 @@ class BookingDialog(CancelAndHelpDialog):
                 self.destination_step,
                 self.origin_step,
                 self.travel_date_step,
-                # self.confirm_step,
+                self.travel_end_date_step,
+                #self.confirm_step,
                 self.final_step,
             ],
         )
@@ -53,7 +54,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Prompt for destination."""
         booking_details = step_context.options
         
-        ### Flyme : Réadaptation des méthodes redéfinie dans ~/booking_details.py
+        ### Flyme : Réadaptation des méthodes redéfinies dans ~/booking_details.py
         if booking_details.dst_city is None: # destination
             return await step_context.prompt(
                 TextPrompt.__name__,
@@ -98,7 +99,26 @@ class BookingDialog(CancelAndHelpDialog):
             )  # pylint: disable=line-too-long
 
         return await step_context.next(booking_details.str_date) # travel_date
+    
+    async def travel_end_date_step(
+            self, step_context: WaterfallStepContext
+        ) -> DialogTurnResult:
+            """Prompt for travel date.
+            This will use the DATE_RESOLVER_DIALOG."""
 
+            booking_details = step_context.options
+
+            # Capture the results of the previous step
+            booking_details.str_date = step_context.result
+            if not booking_details.end_date or self.is_ambiguous(
+                booking_details.end_date
+            ):
+                return await step_context.begin_dialog(
+                    DateResolverDialog.__name__, booking_details.end_date
+                )  # pylint: disable=line-too-long
+
+            return await step_context.next(booking_details.end_date)
+    
     async def confirm_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
@@ -109,7 +129,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.str_date = step_context.result # travel_date
         msg = (
             f"Please confirm, I have you traveling to: { booking_details.dst_city }" # destination
-            f" from: { booking_details.or_city } on: { booking_details.str_date}." # travel_date
+            f" from: { booking_details.or_city } on: { booking_details.str_date}." # origin travel_date
         )
 
         # Offer a YES/NO prompt.
@@ -122,7 +142,7 @@ class BookingDialog(CancelAndHelpDialog):
         if step_context.result:
             booking_details = step_context.options
             booking_details.str_date = step_context.result # travel_date
-
+        ### Flyme : End - Fin des modifications d'appel de méthodes
             return await step_context.end_dialog(booking_details)
 
         return await step_context.end_dialog()
