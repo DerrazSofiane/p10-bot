@@ -55,9 +55,9 @@ class DateResolverDialog(CancelAndHelpDialog):
         timex = step_context.options
         
         if self._dialog_id == DateResolverDialog.START_DATE_DIALOG_ID:
-            prompt_msg = "When do you want to leave 🥳 ?"
+            prompt_msg = "When do you want to leave?"
         elif self._dialog_id == DateResolverDialog.END_DATE_DIALOG_ID:
-            prompt_msg = "When will you be coming back 😮‍💨 ?"
+            prompt_msg = "When do you want to come back?"
         else:
             prompt_msg = "On what date would you like to travel?"
             

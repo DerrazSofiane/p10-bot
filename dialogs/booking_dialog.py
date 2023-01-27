@@ -149,7 +149,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Complete the interaction and end the dialog."""
         if step_context.result:
             booking_details = step_context.options
-            booking_details.str_date = step_context.result # travel_date
+            booking_details.end_date = step_context.result # travel_end_date
         ### Flyme : End - Fin des modifications d'appel de méthodes
             return await step_context.end_dialog(booking_details)
 
