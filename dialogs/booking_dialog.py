@@ -33,6 +33,7 @@ class BookingDialog(CancelAndHelpDialog):
                 self.origin_step,
                 self.travel_date_step,
                 self.travel_end_date_step,
+                self.budget_step,
                 #self.confirm_step,
                 self.final_step,
             ],
@@ -111,7 +112,7 @@ class BookingDialog(CancelAndHelpDialog):
     async def travel_end_date_step(
             self, step_context: WaterfallStepContext
         ) -> DialogTurnResult:
-            """Prompt for travel date.
+            """Prompt for travel date of return.
             This will use the DATE_RESOLVER_DIALOG."""
 
             booking_details = step_context.options
@@ -126,6 +127,22 @@ class BookingDialog(CancelAndHelpDialog):
                 )
                 
             return await step_context.next(booking_details.end_date)
+    
+    async def budget_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Prompt for the budget."""
+        booking_details = step_context.options
+
+        # Capture the response to the previous step's prompt
+        booking_details.end_date = step_context.result
+        if booking_details.budget is None:
+            return await step_context.prompt(
+                TextPrompt.__name__,
+                PromptOptions(
+                    prompt=MessageFactory.text("What is your budget?")
+                ),
+            )  # pylint: disable=line-too-long,bad-continuation
+
+        return await step_context.next(booking_details.budget)   
     
     async def confirm_step(
         self, step_context: WaterfallStepContext
@@ -149,7 +166,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Complete the interaction and end the dialog."""
         if step_context.result:
             booking_details = step_context.options
-            booking_details.end_date = step_context.result # travel_end_date
+            booking_details.budget = step_context.result
         ### Flyme : End - Fin des modifications d'appel de méthodes
             return await step_context.end_dialog(booking_details)
 
