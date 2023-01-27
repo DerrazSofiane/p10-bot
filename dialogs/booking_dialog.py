@@ -52,8 +52,9 @@ class BookingDialog(CancelAndHelpDialog):
     ) -> DialogTurnResult:
         """Prompt for destination."""
         booking_details = step_context.options
-
-        if booking_details.dst_city is None:
+        
+        ### Flyme : Réadaptation des méthodes redéfinie dans ~/booking_details.py
+        if booking_details.dst_city is None: # destination
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
@@ -61,15 +62,15 @@ class BookingDialog(CancelAndHelpDialog):
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
-        return await step_context.next(booking_details.dst_city)
+        return await step_context.next(booking_details.dst_city) # destination
 
     async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Prompt for origin city."""
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
-        booking_details.dst_city = step_context.result
-        if booking_details.or_city is None:
+        booking_details.dst_city = step_context.result # destination
+        if booking_details.or_city is None: # origin
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
@@ -77,7 +78,7 @@ class BookingDialog(CancelAndHelpDialog):
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
-        return await step_context.next(booking_details.or_city)
+        return await step_context.next(booking_details.or_city) # origin
 
     async def travel_date_step(
         self, step_context: WaterfallStepContext
@@ -88,7 +89,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details = step_context.options
 
         # Capture the results of the previous step
-        booking_details.or_city = step_context.result
+        booking_details.or_city = step_context.result # origin
         if not booking_details.travel_date or self.is_ambiguous(
             booking_details.travel_date
         ):
