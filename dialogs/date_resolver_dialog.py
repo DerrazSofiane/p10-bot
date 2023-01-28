@@ -87,7 +87,7 @@ class DateResolverDialog(CancelAndHelpDialog):
 
     async def final_step(self, step_context: WaterfallStepContext):
         """Cleanup - set final return value and end dialog."""
-        timex = step_context.result[0].timex
+        timex = step_context.result.timex
         return await step_context.end_dialog(timex)
 
     @staticmethod

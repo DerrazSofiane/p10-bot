@@ -61,7 +61,6 @@ class LuisHelper:
 
             if intent == Intent.BOOK_FLIGHT.value:
                 result = BookingDetails()
-                print(recognizer_result.entities)
                 # We need to get the result from the LUIS JSON which at every level returns an array.
                 to_entities = recognizer_result.entities.get("$instance", {}).get("dst_city", [])
                 if len(to_entities) > 0:
@@ -94,19 +93,23 @@ class LuisHelper:
                     result.n_children = n_children_entities[0]
                     print("found n_children :", result.n_children)
 
-                # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop
-                # the Time part. TIMEX is a format that represents DateTime expressions that include some ambiguity.
-                # e.g. missing a Year.
-                date_entities = recognizer_result.entities.get("datetime", [])
-                if date_entities:
-                    timex = date_entities[0]["timex"]
-
-                    if timex:
-                        datetime = timex[0].split("T")[0]
-
-                        result.str_date = datetime
+                # This value will be a TIMEX. And we are only interested in a
+                # Date so grab the first result and drop the Time part. TIMEX
+                # is a format that represents DateTime expressions that include
+                # some ambiguity. e.g. missing a Year.
+                str_date_entities = recognizer_result.entities.get("str_date", [])
+                if len(str_date_entities) > 0:
+                    print("found str_date:", str_date_entities[0])
+                    result.str_date = str_date_entities[0]
                 else:
                     result.str_date = None
+                
+                end_date_entities = recognizer_result.entities.get("end_date", [])
+                if len(end_date_entities) > 0:
+                    print("found end_date:", end_date_entities[0])
+                    result.end_date = end_date_entities[0]
+                else:
+                    result.end_date = None
                     
         except Exception as exception:
             print(exception)
