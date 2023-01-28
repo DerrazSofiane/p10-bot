@@ -10,6 +10,8 @@ from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryCli
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
 
+from booking_details import BookingDetails
+
 
 class BookingDialog(CancelAndHelpDialog):
     """Flight booking implementation."""
@@ -57,6 +59,7 @@ class BookingDialog(CancelAndHelpDialog):
         self.add_dialog(waterfall_dialog)
 
         self.initial_dialog_id = WaterfallDialog.__name__
+        #self.luis_result = BookingDetails()
 
     async def destination_step(
         self, step_context: WaterfallStepContext
@@ -156,7 +159,7 @@ class BookingDialog(CancelAndHelpDialog):
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("For how many adults?")
+                    prompt=MessageFactory.text("For how many adult(s)?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
@@ -172,7 +175,7 @@ class BookingDialog(CancelAndHelpDialog):
             return await step_context.prompt(
                 TextPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("And how many childrens?")
+                    prompt=MessageFactory.text("And how many children(s)?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 

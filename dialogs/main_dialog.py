@@ -65,7 +65,7 @@ class MainDialog(ComponentDialog):
         message_text = (
             str(step_context.options)
             if step_context.options
-            else "What can I help you with today?"
+            else "Greetings! How can I help you today?"
         )
         prompt_message = MessageFactory.text(
             message_text, message_text, InputHints.expecting_input

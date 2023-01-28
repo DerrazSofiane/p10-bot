@@ -61,33 +61,38 @@ class LuisHelper:
 
             if intent == Intent.BOOK_FLIGHT.value:
                 result = BookingDetails()
-
+                print(recognizer_result.entities)
                 # We need to get the result from the LUIS JSON which at every level returns an array.
-                to_entities = recognizer_result.entities.get("$instance", {}).get(
-                    "To", []
-                )
+                to_entities = recognizer_result.entities.get("$instance", {}).get("dst_city", [])
                 if len(to_entities) > 0:
-                    if recognizer_result.entities.get("To", [{"$instance": {}}])[0][
-                        "$instance"
-                    ]:
-                        result.destination = to_entities[0]["text"].capitalize()
+                    if recognizer_result.entities.get("dst_city", [{"$instance": {}}]):
+                        result.dst_city = to_entities[0]["text"].capitalize()
+                        print("found dst_city :", result.dst_city)
                     else:
-                        result.unsupported_airports.append(
-                            to_entities[0]["text"].capitalize()
-                        )
+                        result.unsupported_airports.append(to_entities[0]["text"].capitalize())
 
-                from_entities = recognizer_result.entities.get("$instance", {}).get(
-                    "From", []
-                )
+                from_entities = recognizer_result.entities.get("$instance", {}).get("or_city", [])
                 if len(from_entities) > 0:
-                    if recognizer_result.entities.get("From", [{"$instance": {}}])[0][
-                        "$instance"
-                    ]:
-                        result.origin = from_entities[0]["text"].capitalize()
+                    if recognizer_result.entities.get("or_city", [{"$instance": {}}]):
+                        result.or_city = from_entities[0]["text"].capitalize()
+                        print("found or_city :", result.or_city)
                     else:
-                        result.unsupported_airports.append(
-                            from_entities[0]["text"].capitalize()
-                        )
+                        result.unsupported_airports.append(from_entities[0]["text"].capitalize())
+
+                budget_entities = recognizer_result.entities.get("budget", [])
+                if len(budget_entities) > 0:
+                    result.budget = budget_entities[0]
+                    print("found budget :", result.budget)
+
+                n_adults_entities = recognizer_result.entities.get("n_adults", [])
+                if len(n_adults_entities) > 0:
+                    result.n_adults = n_adults_entities[0]
+                    print("found n_adults :", result.n_adults)
+
+                n_children_entities = recognizer_result.entities.get("n_children", [])
+                if len(n_children_entities) > 0:
+                    result.n_children = n_children_entities[0]
+                    print("found n_children :", result.n_children)
 
                 # This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop
                 # the Time part. TIMEX is a format that represents DateTime expressions that include some ambiguity.
@@ -99,11 +104,10 @@ class LuisHelper:
                     if timex:
                         datetime = timex[0].split("T")[0]
 
-                        result.travel_date = datetime
-
+                        result.str_date = datetime
                 else:
-                    result.travel_date = None
-
+                    result.str_date = None
+                    
         except Exception as exception:
             print(exception)
 
