@@ -34,6 +34,8 @@ class BookingDialog(CancelAndHelpDialog):
                 self.travel_date_step,
                 self.travel_end_date_step,
                 self.budget_step,
+                self.n_adults_step,
+                self.n_children_step,
                 #self.confirm_step,
                 self.final_step,
             ],
@@ -144,6 +146,38 @@ class BookingDialog(CancelAndHelpDialog):
 
         return await step_context.next(booking_details.budget)   
     
+    async def n_adults_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Prompt for the budget."""
+        booking_details = step_context.options
+
+        # Capture the response to the previous step's prompt
+        booking_details.budget = step_context.result
+        if booking_details.n_adults is None:
+            return await step_context.prompt(
+                TextPrompt.__name__,
+                PromptOptions(
+                    prompt=MessageFactory.text("For how many adults?")
+                ),
+            )  # pylint: disable=line-too-long,bad-continuation
+
+        return await step_context.next(booking_details.n_adults)      
+    
+    async def n_children_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Prompt for the budget."""
+        booking_details = step_context.options
+
+        # Capture the response to the previous step's prompt
+        booking_details.n_adults = step_context.result
+        if booking_details.n_children is None:
+            return await step_context.prompt(
+                TextPrompt.__name__,
+                PromptOptions(
+                    prompt=MessageFactory.text("And how many childrens?")
+                ),
+            )  # pylint: disable=line-too-long,bad-continuation
+
+        return await step_context.next(booking_details.n_children)     
+    
     async def confirm_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
@@ -166,7 +200,7 @@ class BookingDialog(CancelAndHelpDialog):
         """Complete the interaction and end the dialog."""
         if step_context.result:
             booking_details = step_context.options
-            booking_details.budget = step_context.result
+            booking_details.n_children = step_context.result
         ### Flyme : End - Fin des modifications d'appel de méthodes
             return await step_context.end_dialog(booking_details)
 
