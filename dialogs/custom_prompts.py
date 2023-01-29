@@ -62,7 +62,7 @@ class TextToLuisPrompt(Prompt):
             if len(from_entities) > 0:
                 if recognizer_result.entities.get(
                         entity_to_retrieve, [{"$instance": {}}]):
-                    entity = from_entities[0]["text"].capitalize()
+                    entity = str(from_entities[0]["text"]).capitalize()
                     print(f"found {entity_to_retrieve} :", entity)
             return entity
         

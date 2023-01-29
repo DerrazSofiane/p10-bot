@@ -90,7 +90,7 @@ class BookingDialog(CancelAndHelpDialog):
         ### Flyme : Réadaptation des variables redéfinies dans ~/booking_details.py
         if booking_details.dst_city is None: # destination
             return await step_context.prompt(
-                TextPrompt.__name__,
+                "dst_city",
                 PromptOptions(
                     prompt=MessageFactory.text("To what city would you like to travel?")
                 ),
@@ -164,7 +164,7 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.end_date = step_context.result
         if booking_details.budget is None:
             return await step_context.prompt(
-                TextPrompt.__name__,
+                "budget",
                 PromptOptions(
                     prompt=MessageFactory.text("What is your budget?")
                 ),
