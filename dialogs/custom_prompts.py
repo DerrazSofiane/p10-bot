@@ -61,11 +61,18 @@ class TextToLuisPrompt(Prompt):
             from_entities = entities.get(entity_to_retrieve, [])
             # Double check with prebuilt model entity
             is_valid = ["geographyV2" in key for key in entities.keys()]
-            if len(from_entities) > 0 and True in is_valid:
-                if luis_result.entities.get(
-                        entity_to_retrieve, [{"$instance": {}}]):
-                    entity = str(from_entities[0]["text"]).capitalize()
-                    print(f"found {entity_to_retrieve} :", entity)
+            if entity_to_retrieve == "budget":
+                if len(from_entities) > 0:
+                    if luis_result.entities.get(
+                            entity_to_retrieve, [{"$instance": {}}]):
+                        entity = str(from_entities[0]["text"]).capitalize()
+                        print(f"found {entity_to_retrieve} :", entity)
+            else:
+                if len(from_entities) > 0 and True in is_valid:
+                    if luis_result.entities.get(
+                            entity_to_retrieve, [{"$instance": {}}]):
+                        entity = str(from_entities[0]["text"]).capitalize()
+                        print(f"found {entity_to_retrieve} :", entity)
             return entity
         
         entity = retrieve_entity()

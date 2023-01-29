@@ -18,10 +18,7 @@ from .cancel_and_help_dialog import CancelAndHelpDialog
 
 class DateResolverDialog(CancelAndHelpDialog):
     """Resolve the date"""
-    
-    START_DATE_DIALOG_ID: Final[str] = "StartDateDialog"
-    END_DATE_DIALOG_ID: Final[str] = "EndDateDialog"
-    
+
     def __init__(
         self,
         dialog_id: str = None,
@@ -31,7 +28,7 @@ class DateResolverDialog(CancelAndHelpDialog):
             dialog_id or DateResolverDialog.__name__, telemetry_client
         )
         self.telemetry_client = telemetry_client
-
+        self.dialog_id = dialog_id
         date_time_prompt = DateTimePrompt(
             DateTimePrompt.__name__, DateResolverDialog.datetime_prompt_validator
         )
@@ -43,7 +40,6 @@ class DateResolverDialog(CancelAndHelpDialog):
         waterfall_dialog.telemetry_client = telemetry_client
 
         self.add_dialog(date_time_prompt)
-        self._dialog_id = dialog_id
         self.add_dialog(waterfall_dialog)
 
         self.initial_dialog_id = WaterfallDialog.__name__ + "2"
@@ -53,13 +49,11 @@ class DateResolverDialog(CancelAndHelpDialog):
     ) -> DialogTurnResult:
         """Prompt for the date."""
         timex = step_context.options
-        
-        if self._dialog_id == DateResolverDialog.START_DATE_DIALOG_ID:
-            prompt_msg = "When do you want to leave?"
-        elif self._dialog_id == DateResolverDialog.END_DATE_DIALOG_ID:
-            prompt_msg = "When do you want to come back?"
-        else:
+
+        if self.dialog_id == "str_date":
             prompt_msg = "On what date would you like to travel?"
+        elif self.dialog_id == "end_date":
+            prompt_msg = "On what date would you like to come back?"
             
         reprompt_msg = (
             "I'm sorry, for best results, please enter your travel "
@@ -87,7 +81,7 @@ class DateResolverDialog(CancelAndHelpDialog):
 
     async def final_step(self, step_context: WaterfallStepContext):
         """Cleanup - set final return value and end dialog."""
-        timex = step_context.result
+        timex = step_context.result[0].timex
         return await step_context.end_dialog(timex)
 
     @staticmethod

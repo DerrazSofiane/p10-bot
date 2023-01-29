@@ -68,14 +68,10 @@ class BookingDialog(CancelAndHelpDialog):
         self.add_dialog(TextToLuisPrompt("budget"))
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(
-            DateResolverDialog(
-                DateResolverDialog.START_DATE_DIALOG_ID, self.telemetry_client
-            )
+            DateResolverDialog("str_date", self.telemetry_client)
         )
         self.add_dialog(
-            DateResolverDialog(
-                DateResolverDialog.END_DATE_DIALOG_ID, self.telemetry_client
-            )
+            DateResolverDialog("end_date", self.telemetry_client)
         )
         self.add_dialog(waterfall_dialog)
 
@@ -133,9 +129,8 @@ class BookingDialog(CancelAndHelpDialog):
             booking_details.str_date # travel_date
         ):
             return await step_context.begin_dialog(
-                DateResolverDialog.START_DATE_DIALOG_ID,
-                booking_details.str_date,
-            )
+                "str_date", booking_details.str_date
+            )  # pylint: disable=line-too-long
 
         return await step_context.next(booking_details.str_date) # travel_date
     
@@ -151,13 +146,12 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.str_date = step_context.result
         print(booking_details.str_date)
-        
         if not booking_details.end_date or self.is_ambiguous(
             booking_details.end_date
         ):
             return await step_context.begin_dialog(
-                DateResolverDialog.END_DATE_DIALOG_ID, booking_details.end_date
-            )
+                "end_date", booking_details.end_date
+            )  # pylint: disable=line-too-long
             
         return await step_context.next(booking_details.end_date)
     
@@ -231,7 +225,8 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.n_children = step_context.result
         msg = (
-            f"""Please confirm, I have you traveling to: {booking_details.dst_city};
+            f"""Please confirm, I have you traveling
+            \nto: {booking_details.dst_city};
             \nfrom: {booking_details.or_city};
             \ndeparture on: {booking_details.str_date};
             \nreturn on: {booking_details.end_date};
