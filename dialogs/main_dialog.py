@@ -1,5 +1,37 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+"""Ce fichier main_dialog.py contient la classe MainDialog, qui est un composant
+de dialogue pour un bot de voyage basé sur LUIS (Language Understanding Intelligent Service).
+La classe MainDialog hérite de la classe ComponentDialog de Bot Builder SDK et
+utilise des dialogues en cascades pour gérer les différents scénarios de
+dialogue possibles avec l'utilisateur. Les dialogues en cascade sont définis en
+utilisant la classe WaterfallDialog et les étapes de la cascade sont définies par
+des méthodes asynchrones (async) qui prennent un WaterfallStepContext en entrée
+et retournent un DialogTurnResult.
+
+Lorsque MainDialog est instancié, il prend en entrée un objet luis_recognizer de
+type FlightBookingRecognizer, un objet booking_dialog de type BookingDialog et un
+objet telemetry_client de type BotTelemetryClient. Il initialise également un
+TextPrompt et un WaterfallDialog pour gérer les interactions avec l'utilisateur.
+
+La méthode intro_step est appelée en premier et affiche un message de bienvenue
+à l'utilisateur. Si LUIS n'est pas configuré, elle affiche un message informant
+l'utilisateur que toutes les fonctionnalités ne sont pas disponibles. Sinon,
+elle envoie un message demandant à l'utilisateur comment il peut être aidé.
+
+La méthode act_step est appelée ensuite. Si LUIS n'est pas configuré, elle
+démarre le dialogue de réservation en passant une instance vide de BookingDetails.
+Sinon, elle appelle LUIS pour obtenir les détails de la réservation
+(si l'intention est de réserver un vol) ou les informations sur la météo
+(si l'intention est d'obtenir la météo) puis démarre le dialogue de réservation
+en passant les détails obtenus de LUIS. Si LUIS ne parvient pas à comprendre
+l'intention de l'utilisateur, elle envoie un message demandant à l'utilisateur
+de reformuler sa demande.
+
+La méthode final_step est enfin appelée pour afficher un message de confirmation
+ou un message d'erreur à l'utilisateur en fonction de la réussite ou de l'échec
+de la réservation.
+"""
 
 from botbuilder.dialogs import (
     ComponentDialog,
