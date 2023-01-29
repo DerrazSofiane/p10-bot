@@ -181,10 +181,15 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the response to the previous step's prompt
         booking_details.budget = step_context.result
         if booking_details.n_adults is None:
+            reprompt_msg = """Please include a numerical reference in your
+            sentence.
+            For example: "We are 2 adults traveling." or "We are two adults.".
+            """
             return await step_context.prompt(
                 NumberPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("For how many adult(s)?")
+                    prompt=MessageFactory.text("For how many adult(s)?"),
+                    retry_prompt=MessageFactory.text(reprompt_msg)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
@@ -198,10 +203,15 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.n_adults = step_context.result
         
         if booking_details.n_children is None:
+            reprompt_msg = """Please include a numerical reference in your
+            sentence.
+            For example: "I have 1 children." or "I have one children.".
+            """
             return await step_context.prompt(
                 NumberPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("And how many children(s)?")
+                    prompt=MessageFactory.text("And how many children(s)?"),
+                    retry_prompt=MessageFactory.text(reprompt_msg)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
