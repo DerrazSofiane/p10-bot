@@ -147,6 +147,8 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.str_date = step_context.result
+        print(booking_details.str_date)        
+        
         if not booking_details.end_date or self.is_ambiguous(
             booking_details.end_date
         ):
@@ -224,8 +226,13 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the results of the previous step
         booking_details.n_children = step_context.result
         msg = (
-            f"Please confirm, I have you traveling to: { booking_details.dst_city }"
-            f" from: { booking_details.or_city } on: { booking_details.str_date }."
+            f"""Please confirm, I have you traveling to: {booking_details.dst_city};
+            \nfrom: {booking_details.or_city};
+            \ndeparture on: {booking_details.str_date};
+            \nreturn on: {booking_details.end_date};
+            \nfor {booking_details.n_adults} adult(s);
+            \nand {booking_details.n_children} children(s);
+            \nwith a budget of: {booking_details.budget}."""
         )
 
         # Offer a YES/NO prompt.

@@ -57,22 +57,25 @@ class TextToLuisPrompt(Prompt):
             entity_to_retrieve=self.dialog_id
             ):
             entity = None
-            from_entities = recognizer_result.entities.get("$instance", {})
+            from_entities = luis_result.entities.get("$instance", {})
             from_entities = from_entities.get(entity_to_retrieve, [])
             if len(from_entities) > 0:
-                if recognizer_result.entities.get(
+                if luis_result.entities.get(
                         entity_to_retrieve, [{"$instance": {}}]):
                     entity = str(from_entities[0]["text"]).capitalize()
                     print(f"found {entity_to_retrieve} :", entity)
             return entity
         
-        recognizer_result = retrieve_entity(recognizer_result)
-        
-        if recognizer_result is None:
+        entity = retrieve_entity()
+        if entity is None:
+            # Retry with the built-in entity
+            entity = retrieve_entity(entity_to_retrieve="geographyV2_city")
+            
+        if entity is None:
             prompt_result.succeeded = False
         else:
             prompt_result.succeeded = True
-            prompt_result.value = recognizer_result
+            prompt_result.value = entity
 
         return prompt_result
     
