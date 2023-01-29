@@ -95,6 +95,7 @@ class DateResolverDialog(CancelAndHelpDialog):
         """ Validate the date provided is in proper form. """
         if prompt_context.recognized.succeeded:
             timex = prompt_context.recognized.value[0].timex.split("T")[0]
+
             # TODO: Needs TimexProperty
             return "definite" in Timex(timex).types
 

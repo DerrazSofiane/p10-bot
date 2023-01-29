@@ -57,9 +57,10 @@ class TextToLuisPrompt(Prompt):
             entity_to_retrieve=self.dialog_id
             ):
             entity = None
-            from_entities = luis_result.entities.get("$instance", {})
-            from_entities = from_entities.get(entity_to_retrieve, [])
-            if len(from_entities) > 0:
+            entities = luis_result.entities.get("$instance", {})
+            from_entities = entities.get(entity_to_retrieve, [])
+            is_valid = ["geographyV2" in key for key in entities.keys()]
+            if len(from_entities) > 0 and True in is_valid:
                 if luis_result.entities.get(
                         entity_to_retrieve, [{"$instance": {}}]):
                     entity = str(from_entities[0]["text"]).capitalize()
@@ -67,8 +68,8 @@ class TextToLuisPrompt(Prompt):
             return entity
         
         entity = retrieve_entity()
-        if entity is None:
-            # Retry with the built-in entity
+        if entity is None and (self.dialog_id=="or_city" or self.dialog_id=="dst_city"):
+            # Retry with the built-in entity to parse the city
             entity = retrieve_entity(entity_to_retrieve="geographyV2_city")
             
         if entity is None:

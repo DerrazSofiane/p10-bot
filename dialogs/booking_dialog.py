@@ -89,10 +89,12 @@ class BookingDialog(CancelAndHelpDialog):
 
         ### Flyme : Réadaptation des variables redéfinies dans ~/booking_details.py
         if booking_details.dst_city is None: # destination
+            retry_prompt = "Sorry, I couldn't find this place. Please enter a valid place."
             return await step_context.prompt(
                 "dst_city",
                 PromptOptions(
-                    prompt=MessageFactory.text("To what city would you like to travel?")
+                    prompt=MessageFactory.text("To what city would you like to travel?"),
+                    retry_prompt=MessageFactory.text(retry_prompt)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
@@ -106,11 +108,12 @@ class BookingDialog(CancelAndHelpDialog):
         booking_details.dst_city = step_context.result # destination
         
         if booking_details.or_city is None: # origin
+            retry_prompt = "Sorry, I couldn't find this place. Please enter a valid place."
             return await step_context.prompt(
                 "or_city",
                 PromptOptions(
                     prompt=MessageFactory.text("From what city will you be travelling?"),
-                    # retry_prompt="Sorry, I couldn't find this place."
+                    retry_prompt=MessageFactory.text(retry_prompt)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
         
@@ -147,7 +150,7 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.str_date = step_context.result
-        print(booking_details.str_date)        
+        print(booking_details.str_date)
         
         if not booking_details.end_date or self.is_ambiguous(
             booking_details.end_date
@@ -165,6 +168,8 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the response to the previous step's prompt
         booking_details.end_date = step_context.result
         if booking_details.budget is None:
+            retry_prompt = "Sorry, I couldn't process your budget input."
+            "Try in a different way. Eg. 'I have a budget of 500$.'."
             return await step_context.prompt(
                 "budget",
                 PromptOptions(
