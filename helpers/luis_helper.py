@@ -113,5 +113,5 @@ class LuisHelper:
                     
         except Exception as exception:
             print(exception)
-
+            
         return intent, result

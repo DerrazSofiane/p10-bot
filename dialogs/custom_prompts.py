@@ -1,20 +1,25 @@
 from botbuilder.dialogs.prompts import Prompt, PromptOptions, TextPrompt, PromptRecognizerResult
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
-from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext, DialogTurnResult
-from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryClient
+
 from flight_booking_recognizer import FlightBookingRecognizer
+from config import DefaultConfig
 from helpers.luis_helper import LuisHelper, Intent
-from typing import Callable, Dict
+
+from typing import Dict
 
 
 class TextToLuisPrompt(Prompt):
     def __init__(
-        self, dialog_id: str, luis_recognizer: FlightBookingRecognizer=FlightBookingRecognizer
+        self,
+        dialog_id: str,
+        luis_recognizer: FlightBookingRecognizer = FlightBookingRecognizer(DefaultConfig),
+        validator : object = None
         ):
+        self.dialog_id = dialog_id
         self.luis_recognizer = luis_recognizer
         self.detected_intent = None
-        super().__init__(dialog_id)
+        super().__init__(dialog_id, validator=validator)
 
     async def on_prompt(
         self, turn_context: TurnContext, 
@@ -45,9 +50,29 @@ class TextToLuisPrompt(Prompt):
             usertext = turn_context.activity.text
 
         prompt_result = PromptRecognizerResult()
+        recognizer_result = await self.luis_recognizer.recognize(turn_context)
         
-        print(usertext)
-        prompt_result.value = usertext
-        prompt_result.succeeded = True
+        def retrieve_entity(
+            luis_result=recognizer_result,
+            entity_to_retrieve=self.dialog_id
+            ):
+            entity = None
+            from_entities = recognizer_result.entities.get("$instance", {})
+            from_entities = from_entities.get(entity_to_retrieve, [])
+            if len(from_entities) > 0:
+                if recognizer_result.entities.get(
+                        entity_to_retrieve, [{"$instance": {}}]):
+                    entity = from_entities[0]["text"].capitalize()
+                    print(f"found {entity_to_retrieve} :", entity)
+            return entity
+        
+        recognizer_result = retrieve_entity(recognizer_result)
+        
+        if recognizer_result is None:
+            prompt_result.succeeded = False
+        else:
+            prompt_result.succeeded = True
+            prompt_result.value = recognizer_result
 
         return prompt_result
+    

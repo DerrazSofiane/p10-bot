@@ -44,8 +44,6 @@ class BookingDialog(CancelAndHelpDialog):
         
         text_prompt = TextPrompt(TextPrompt.__name__)
         text_prompt.telemetry_client = telemetry_client
-        
-        text_luis_prompt = TextToLuisPrompt(TextToLuisPrompt.__name__)
 
         waterfall_dialog = WaterfallDialog(
             WaterfallDialog.__name__,
@@ -63,9 +61,11 @@ class BookingDialog(CancelAndHelpDialog):
         )
         waterfall_dialog.telemetry_client = telemetry_client
 
-        self.add_dialog(text_luis_prompt)
         self.add_dialog(number_prompt)
         self.add_dialog(text_prompt)
+        self.add_dialog(TextToLuisPrompt("dst_city"))
+        self.add_dialog(TextToLuisPrompt("or_city"))
+        self.add_dialog(TextToLuisPrompt("budget"))
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(
             DateResolverDialog(
@@ -107,9 +107,10 @@ class BookingDialog(CancelAndHelpDialog):
         
         if booking_details.or_city is None: # origin
             return await step_context.prompt(
-                TextToLuisPrompt.__name__,
+                "or_city",
                 PromptOptions(
-                    prompt=MessageFactory.text("From what city will you be travelling?")
+                    prompt=MessageFactory.text("From what city will you be travelling?"),
+                    # retry_prompt="Sorry, I couldn't find this place."
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
         
