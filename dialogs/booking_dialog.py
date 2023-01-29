@@ -14,14 +14,16 @@ classe qui gère les intents d'annulation et d'aide."""
 from datatypes_date_time.timex import Timex
 
 from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext, DialogTurnResult
-from botbuilder.dialogs.prompts import ConfirmPrompt, TextPrompt, PromptOptions, NumberPrompt
+from botbuilder.dialogs.prompts import (
+    ConfirmPrompt,
+    TextPrompt,
+    PromptOptions,
+    NumberPrompt,
+    )
 from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryClient
 from .cancel_and_help_dialog import CancelAndHelpDialog
 from .date_resolver_dialog import DateResolverDialog
-
-from booking_details import BookingDetails
-from flight_booking_recognizer import FlightBookingRecognizer
-from helpers.luis_helper import LuisHelper, Intent
+from dialogs.custom_prompts import TextToLuisPrompt
 
 
 class BookingDialog(CancelAndHelpDialog):
@@ -29,15 +31,12 @@ class BookingDialog(CancelAndHelpDialog):
 
     def __init__(
         self,
-        luis_recognizer: FlightBookingRecognizer,
         dialog_id: str = None,
         telemetry_client: BotTelemetryClient = NullTelemetryClient()
-        
     ):
         super(BookingDialog, self).__init__(
             dialog_id or BookingDialog.__name__, telemetry_client
         )
-        self._luis_recognizer = luis_recognizer
         self.telemetry_client = telemetry_client
         
         number_prompt = NumberPrompt(NumberPrompt.__name__)
@@ -45,6 +44,8 @@ class BookingDialog(CancelAndHelpDialog):
         
         text_prompt = TextPrompt(TextPrompt.__name__)
         text_prompt.telemetry_client = telemetry_client
+        
+        text_luis_prompt = TextToLuisPrompt(TextToLuisPrompt.__name__)
 
         waterfall_dialog = WaterfallDialog(
             WaterfallDialog.__name__,
@@ -62,6 +63,7 @@ class BookingDialog(CancelAndHelpDialog):
         )
         waterfall_dialog.telemetry_client = telemetry_client
 
+        self.add_dialog(text_luis_prompt)
         self.add_dialog(number_prompt)
         self.add_dialog(text_prompt)
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
@@ -105,16 +107,11 @@ class BookingDialog(CancelAndHelpDialog):
         
         if booking_details.or_city is None: # origin
             return await step_context.prompt(
-                TextPrompt.__name__,
+                TextToLuisPrompt.__name__,
                 PromptOptions(
                     prompt=MessageFactory.text("From what city will you be travelling?")
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
-            
-            # intent, luis_result = await LuisHelper.execute_luis_query(
-            #     self._luis_recognizer, user_inpt
-            #     )
-            # print(luis_result)
         
         return await step_context.next(booking_details.or_city) # origin
 

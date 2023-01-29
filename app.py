@@ -64,7 +64,7 @@ TELEMETRY_CLIENT = ApplicationInsightsTelemetryClient(
 
 # Create dialogs and Bot
 RECOGNIZER = FlightBookingRecognizer(CONFIG)
-BOOKING_DIALOG = BookingDialog(RECOGNIZER)
+BOOKING_DIALOG = BookingDialog()
 DIALOG = MainDialog(RECOGNIZER, BOOKING_DIALOG, telemetry_client=TELEMETRY_CLIENT)
 BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG, TELEMETRY_CLIENT)
 
