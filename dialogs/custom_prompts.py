@@ -59,6 +59,7 @@ class TextToLuisPrompt(Prompt):
             entity = None
             entities = luis_result.entities.get("$instance", {})
             from_entities = entities.get(entity_to_retrieve, [])
+            # Double check with prebuilt model entity
             is_valid = ["geographyV2" in key for key in entities.keys()]
             if len(from_entities) > 0 and True in is_valid:
                 if luis_result.entities.get(
