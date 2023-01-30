@@ -40,7 +40,13 @@
           "weight": "Lighter",
           "color": "Accent",
           "isSubtle": true,
-          "horizontalAlignment": "Left",
+          "separator": true
+      },
+      {
+          "type": "TextBlock",
+          "text": "First, press a key to start the chat.",
+          "wrap": true,
+          "weight": "Bolder",
           "separator": true
       }
   ]
