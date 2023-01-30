@@ -162,12 +162,13 @@ class BookingDialog(CancelAndHelpDialog):
         # Capture the response to the previous step's prompt
         booking_details.end_date = step_context.result
         if booking_details.budget is None:
-            retry_prompt = "Sorry, I couldn't process your budget input."
-            "Try in a different way. Eg. 'I have a budget of 500$.'."
+            retry_prompt = """Sorry, I couldn't process your budget input. Try
+            in a different way. Eg. 'I have a budget of 500$.'."""
             return await step_context.prompt(
                 "budget",
                 PromptOptions(
-                    prompt=MessageFactory.text("What is your budget?")
+                    prompt=MessageFactory.text("What is your budget?"),
+                    retry_prompt=MessageFactory.text(retry_prompt)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 

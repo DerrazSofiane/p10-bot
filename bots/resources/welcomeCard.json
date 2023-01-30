@@ -3,27 +3,45 @@
   "type": "AdaptiveCard",
   "version": "1.0",
   "body": [
-    {
-      "type": "Image",
-      "url": "https://user.oc-static.com/upload/2019/10/24/15719199766568_Capture%20d%E2%80%99e%CC%81cran%202019-10-24%20a%CC%80%2014.14.41.png",
-      "size": "stretch"
-    },
-    {
-      "type": "TextBlock",
-      "spacing": "medium",
-      "size": "default",
-      "weight": "bolder",
-      "text": "Welcome to Fly Me!",
-      "wrap": true,
-      "maxLines": 0
-    },
-    {
-      "type": "TextBlock",
-      "size": "default",
-      "isSubtle": "true",
-      "text": "Schedule your journey with our Chat Bot, powered by AI.",
-      "wrap": true,
-      "maxLines": 0
-    }
+      {
+          "type": "Image",
+          "url": "https://user.oc-static.com/upload/2019/10/24/15719199766568_Capture%20d%E2%80%99e%CC%81cran%202019-10-24%20a%CC%80%2014.14.41.png",
+          "size": "Stretch"
+      },
+      {
+          "type": "TextBlock",
+          "spacing": "Medium",
+          "size": "Default",
+          "weight": "Bolder",
+          "text": "Welcome to Fly Me!",
+          "wrap": true,
+          "maxLines": 0
+      },
+      {
+          "type": "TextBlock",
+          "size": "Default",
+          "isSubtle": true,
+          "text": "Schedule your journey with our Chat Bot, powered by AI.",
+          "wrap": true,
+          "maxLines": 0
+      },
+      {
+          "type": "TextBlock",
+          "text": "Start now by entering your booking request. For eg.:",
+          "wrap": true,
+          "weight": "Bolder"
+      },
+      {
+          "type": "TextBlock",
+          "text": "I want to go from London to Paris.",
+          "wrap": true,
+          "fontType": "Monospace",
+          "size": "Default",
+          "weight": "Lighter",
+          "color": "Accent",
+          "isSubtle": true,
+          "horizontalAlignment": "Left",
+          "separator": true
+      }
   ]
 }

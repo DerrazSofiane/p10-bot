@@ -71,7 +71,7 @@ class MainDialog(ComponentDialog):
         booking_dialog.telemetry_client = self.telemetry_client
 
         wf_dialog = WaterfallDialog(
-            "WFDialog", [self.intro_step, self.act_step, self.final_step]
+            "WFDialog", [self.act_step, self.final_step]
         )
         wf_dialog.telemetry_client = self.telemetry_client
 
@@ -83,30 +83,6 @@ class MainDialog(ComponentDialog):
         self.add_dialog(wf_dialog)
 
         self.initial_dialog_id = "WFDialog"
-
-    async def intro_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        if not self._luis_recognizer.is_configured:
-            await step_context.context.send_activity(
-                MessageFactory.text(
-                    "NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and "
-                    "'LuisAPIHostName' to the appsettings.json file.",
-                    input_hint=InputHints.ignoring_input,
-                )
-            )
-
-            return await step_context.next(None)
-        message_text = (
-            str(step_context.options)
-            if step_context.options
-            else "Greetings! How can I help you today?"
-        )
-        prompt_message = MessageFactory.text(
-            message_text, message_text, InputHints.expecting_input
-        )
-
-        return await step_context.prompt(
-            TextPrompt.__name__, PromptOptions(prompt=prompt_message)
-        )
 
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         if not self._luis_recognizer.is_configured:

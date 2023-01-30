@@ -97,18 +97,26 @@ class LuisHelper:
                 # Date so grab the first result and drop the Time part. TIMEX
                 # is a format that represents DateTime expressions that include
                 # some ambiguity. e.g. missing a Year.
-                str_date, end_date = None, None
-
                 date_entities = recognizer_result.entities.get("datetime", [])
                 if date_entities:
-                    timex = date_entities[0]["timex"]
-                    if date_entities[0]["type"] == "daterange":
-                        str_date, end_date = timex[0].replace("(", "").replace(")", "").split(",")
-                    elif date_entities[0]["type"] == "date":
-                        str_date = timex[0]
-
-                result.str_date = str_date
-                result.end_date = end_date
+                    if len(date_entities)==1:
+                        timex = date_entities[0]["timex"]
+                        if date_entities[0]['type'] == 'daterange':
+                            datetime_range = timex[0].strip('(').strip(')').split(',')
+                            result.str_date = datetime_range[0]
+                            result.end_date = datetime_range[1]
+                        elif date_entities[0]['type'] == 'date':
+                            result.str_date = timex[0]
+                    
+                    elif len(date_entities)==2:
+                        timex1 = date_entities[0]["timex"]
+                        timex2 = date_entities[1]["timex"]
+                        if timex1[0] <= timex2[0]:
+                            result.str_date = timex1[0]
+                            result.end_date = timex2[0]
+                        else:
+                            result.str_date = timex2[0]
+                            result.end_date = timex1[0]
                     
         except Exception as exception:
             print(exception)
