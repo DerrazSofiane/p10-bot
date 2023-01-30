@@ -51,6 +51,7 @@ from botbuilder.schema import InputHints
 from booking_details import BookingDetails
 from flight_booking_recognizer import FlightBookingRecognizer
 from helpers.luis_helper import LuisHelper, Intent
+from .flight_itinerary_card import FlightItineraryCard
 from .booking_dialog import BookingDialog
 
 
@@ -118,7 +119,7 @@ class MainDialog(ComponentDialog):
         intent, luis_result = await LuisHelper.execute_luis_query(
             self._luis_recognizer, step_context.context
         )
-
+        print(intent)
         if intent == Intent.BOOK_FLIGHT.value and luis_result:
             # Show a warning for Origin and Destination if we can't resolve them.
             await MainDialog._show_warning_for_unsupported_cities(
@@ -128,13 +129,28 @@ class MainDialog(ComponentDialog):
             # Run the BookingDialog giving it whatever details we have from the LUIS call.
             return await step_context.begin_dialog(self._booking_dialog_id, luis_result)
 
-        if intent == Intent.GET_WEATHER.value:
-            get_weather_text = "TODO: get weather flow here"
-            get_weather_message = MessageFactory.text(
-                get_weather_text, get_weather_text, InputHints.ignoring_input
+        elif intent == Intent.CANCEL.value:
+            cancel_text = "See you soon!"
+            cancel_message = MessageFactory.text(
+                cancel_text, cancel_text, InputHints.ignoring_input
             )
-            await step_context.context.send_activity(get_weather_message)
+            await step_context.context.send_activity(cancel_message)
 
+        elif intent == Intent.CONFIRM.value:
+            confirm_text = "Good!"
+            confirm_message = MessageFactory.text(
+                confirm_text, confirm_text, InputHints.ignoring_input
+            )
+            await step_context.context.send_activity(confirm_message)
+            
+        elif intent == Intent.NONE_INTENT.value:
+            none_text = """Sorry, I'm programmed to book flights. Please try to
+            express your intent clearly."""
+            none_message = MessageFactory.text(
+                none_text, none_text, InputHints.ignoring_input
+            )
+            await step_context.context.send_activity(none_message)
+                       
         else:
             didnt_understand_text = (
                 "Sorry, I didn't get that. Please try asking in a different way"
@@ -151,21 +167,23 @@ class MainDialog(ComponentDialog):
         # the Result here will be null.
         if step_context.result is not None:
             result = step_context.result
-
-            # Now we have all the booking details call the booking service.
-
-            # If the call to the booking service was successful tell the user.
-            # time_property = Timex(result.travel_date)
-            # travel_date_msg = time_property.to_natural_language(datetime.now())
-            msg_txt = f"""I have you booked to {result.dst_city} from
-            {result.or_city} on {result.str_date} and return on {result.end_date}.
-            Your budget is {result.budget}. For {result.n_adults} adult(s) and 
-            {result.n_children} children(s).
+            
+            flight_card = FlightItineraryCard(result)
+            card = flight_card.create_attachment()
+            response = MessageFactory.attachment(card)
+            await step_context.context.send_activity(response)
+            
+            msg_txt = f"""Your flight is confirmed for {result.n_adults}
+            adult(s) and {result.n_children}, from {result.or_city} to
+            {result.dst_city}, on {result.str_date} and return on
+            {result.end_date}.
+            All of the booking details will be sent to you via email. Have a
+            good flight!
             """
             message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
             await step_context.context.send_activity(message)
 
-        prompt_message = "What else can I do for you?"
+        prompt_message = "Do you want something else?"
         return await step_context.replace_dialog(self.id, prompt_message)
 
     @staticmethod

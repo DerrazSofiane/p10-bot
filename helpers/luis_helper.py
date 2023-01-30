@@ -17,8 +17,8 @@ from booking_details import BookingDetails
 ### BEGIN : Redéfinition des intentions
 class Intent(Enum):
     BOOK_FLIGHT = "BookFlightIntent"
-    CANCEL = "Communication.Cancel"
-    CONFIRM = "Communication.Confirm"
+    CANCEL = "Communication_Cancel"
+    CONFIRM = "Communication_Confirm"
     NONE_INTENT = "None"
 ### END
 

@@ -204,12 +204,12 @@ class BookingDialog(CancelAndHelpDialog):
         if booking_details.n_children is None:
             reprompt_msg = """Please include a numerical reference in your
             sentence.
-            For example: "I have 1 children." or "I have one children.".
+            For example: "I have 1 child." or "I have one child.".
             """
             return await step_context.prompt(
                 NumberPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("And how many children(s)?"),
+                    prompt=MessageFactory.text("And how many child(ren)?"),
                     retry_prompt=MessageFactory.text(reprompt_msg)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
