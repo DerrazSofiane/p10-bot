@@ -153,7 +153,8 @@ class MainDialog(ComponentDialog):
                        
         else:
             didnt_understand_text = (
-                "Sorry, I didn't get that. Please try asking in a different way"
+                """Sorry, I didn't get that. Please try asking in a different way.
+                (Press a key to restart the bot)"""
             )
             didnt_understand_message = MessageFactory.text(
                 didnt_understand_text, didnt_understand_text, InputHints.ignoring_input
