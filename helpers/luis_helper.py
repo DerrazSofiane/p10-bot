@@ -65,18 +65,18 @@ class LuisHelper:
                 to_entities = recognizer_result.entities.get("$instance", {}).get("dst_city", [])
                 if len(to_entities) > 0:
                     if recognizer_result.entities.get("dst_city", [{"$instance": {}}]):
-                        result.dst_city = to_entities[0]["text"].capitalize()
+                        result.dst_city = to_entities[0]["text"].title()
                         print("found dst_city :", result.dst_city)
                     else:
-                        result.unsupported_airports.append(to_entities[0]["text"].capitalize())
+                        result.unsupported_airports.append(to_entities[0]["text"].title())
 
                 from_entities = recognizer_result.entities.get("$instance", {}).get("or_city", [])
                 if len(from_entities) > 0:
                     if recognizer_result.entities.get("or_city", [{"$instance": {}}]):
-                        result.or_city = from_entities[0]["text"].capitalize()
+                        result.or_city = from_entities[0]["text"].title()
                         print("found or_city :", result.or_city)
                     else:
-                        result.unsupported_airports.append(from_entities[0]["text"].capitalize())
+                        result.unsupported_airports.append(from_entities[0]["text"].title())
 
                 budget_entities = recognizer_result.entities.get("budget", [])
                 if len(budget_entities) > 0:
