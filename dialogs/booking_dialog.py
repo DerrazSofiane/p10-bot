@@ -243,10 +243,25 @@ class BookingDialog(CancelAndHelpDialog):
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Complete the interaction and end the dialog."""
+        booking_details = step_context.options
+        properties = {
+            "or_city": booking_details.or_city,
+            "dst_city": booking_details.dst_city,
+            "str_date": booking_details.str_date,
+            "end_date": booking_details.end_date,
+            "budget": booking_details.budget,
+            "n_adults": booking_details.n_adults,
+            "n_children": booking_details.n_children
+        }
+
         if step_context.result:
-            booking_details = step_context.options
-        ### Flyme : End - Fin des modifications d'appel de méthodes
+            self.telemetry_client.track_trace("Booking confirmed", properties, "INFO")
             return await step_context.end_dialog(booking_details)
+
+        self.telemetry_client.track_trace("Booking declined", properties, "ERROR")
+        await step_context.context.send_activity(
+            MessageFactory.text("I invite you to make a new booking.")
+        )
 
         return await step_context.end_dialog()
 
