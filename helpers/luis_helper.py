@@ -98,7 +98,6 @@ class LuisHelper:
                 # is a format that represents DateTime expressions that include
                 # some ambiguity. e.g. missing a Year.
                 date_entities = recognizer_result.entities.get("datetime", [])
-                print(date_entities)
                 if date_entities:
                     if len(date_entities)<=2:
                         timex = date_entities[0]["timex"]
@@ -125,7 +124,7 @@ class LuisHelper:
                             result.str_date = timex2[0]
                             result.end_date = timex1[0]
                         print("found str_date:", result.str_date)
-                        print("found end_date:", result.str_date)
+                        print("found end_date:", result.end_date)
                     
         except Exception as exception:
             print(exception)
