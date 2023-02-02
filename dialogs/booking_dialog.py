@@ -225,16 +225,10 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.n_children = step_context.result
-        msg = (
-            f"""Please confirm, I have you traveling
-            \nto: {booking_details.dst_city};
-            \nfrom: {booking_details.or_city};
-            \ndeparture on: {booking_details.str_date};
-            \nreturn on: {booking_details.end_date};
-            \nfor {booking_details.n_adults} adult(s);
-            \nand {booking_details.n_children} children(s);
-            \nwith a budget of: {booking_details.budget}."""
-        )
+        msg = (f"Just confirming, you are traveling from {booking_details.or_city} to {booking_details.dst_city} "
+               f"from {booking_details.str_date} to {booking_details.end_date} with {booking_details.n_adults} adult(s) "
+               f"and {booking_details.n_children} child(ren), and a budget of {booking_details.budget}. Does this sound correct?"
+              )
 
         # Offer a YES/NO prompt.
         return await step_context.prompt(
