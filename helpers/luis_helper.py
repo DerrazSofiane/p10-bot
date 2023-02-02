@@ -98,8 +98,9 @@ class LuisHelper:
                 # is a format that represents DateTime expressions that include
                 # some ambiguity. e.g. missing a Year.
                 date_entities = recognizer_result.entities.get("datetime", [])
+                print(date_entities)
                 if date_entities:
-                    if len(date_entities)==1:
+                    if len(date_entities)<=2:
                         timex = date_entities[0]["timex"]
                         if date_entities[0]['type'] == 'daterange':
                             datetime_range = timex[0].strip('(').strip(')').split(',')
@@ -108,15 +109,23 @@ class LuisHelper:
                         elif date_entities[0]['type'] == 'date':
                             result.str_date = timex[0]
                     
-                    elif len(date_entities)==2:
+                    elif len(date_entities)>2:
                         timex1 = date_entities[0]["timex"]
                         timex2 = date_entities[1]["timex"]
                         if timex1[0] <= timex2[0]:
-                            result.str_date = timex1[0]
-                            result.end_date = timex2[0]
+                            if "X" in timex1[0]:
+                                result.str_date = None
+                            else:
+                                result.str_date = timex1[0]
+                            if "X" in timex2[0]:
+                                result.end_date = None
+                            else:
+                                result.end_date = timex2[0]
                         else:
                             result.str_date = timex2[0]
                             result.end_date = timex1[0]
+                        print("found str_date:", result.str_date)
+                        print("found end_date:", result.str_date)
                     
         except Exception as exception:
             print(exception)
