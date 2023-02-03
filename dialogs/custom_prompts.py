@@ -64,13 +64,13 @@ class TextToLuisPrompt(Prompt):
                 if len(from_entities) > 0:
                     if luis_result.entities.get(
                             entity_to_retrieve, [{"$instance": {}}]):
-                        entity = str(from_entities[0]["text"]).capitalize()
+                        entity = str(from_entities[0]["text"])
                         print(f"found {entity_to_retrieve} :", entity)
             else:
                 if len(from_entities) > 0 and True in is_valid:
                     if luis_result.entities.get(
                             entity_to_retrieve, [{"$instance": {}}]):
-                        entity = str(from_entities[0]["text"]).capitalize()
+                        entity = str(from_entities[0]["text"]).title()
                         print(f"found {entity_to_retrieve} :", entity)
             return entity
         

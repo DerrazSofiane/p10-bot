@@ -76,39 +76,62 @@ class BookingDialog(CancelAndHelpDialog):
         self.add_dialog(waterfall_dialog)
 
         self.initial_dialog_id = WaterfallDialog.__name__
+        
+        # Date messages step are defined in .\dialogs\date_resolver_dialog.py
+        self.destination_step_message = "To what city would you like to travel?"
+        self.origin_step_message = "From what city will you be travelling?"
+        self.budget_step_message = "What is your budget?"
+        self.n_adults_step_message = "For how many adult(s)?"
+        self.n_children_step_message = "And how many child(ren)?"
+
+    def generate_step_log(
+        self, bot_prompt:str, user_input:str, step_name:str
+        ):
+        bot_log = {"bot": bot_prompt, "user": user_input, "step": step_name}
+        return bot_log
 
     async def destination_step(
         self, step_context: WaterfallStepContext
     ) -> DialogTurnResult:
         """Prompt for destination."""
         booking_details = step_context.options
-
+        
         ### Flyme : Réadaptation des variables redéfinies dans ~/booking_details.py
         if booking_details.dst_city is None: # destination
             retry_prompt = "Sorry, I couldn't find this place. Please enter a valid place."
             return await step_context.prompt(
                 "dst_city",
                 PromptOptions(
-                    prompt=MessageFactory.text("To what city would you like to travel?"),
+                    prompt=MessageFactory.text(self.destination_step_message),
                     retry_prompt=MessageFactory.text(retry_prompt)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
         return await step_context.next(booking_details.dst_city) # destination
 
-    async def origin_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def origin_step(
+        self, step_context: WaterfallStepContext
+        ) -> DialogTurnResult:
         """Prompt for origin city."""
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
         booking_details.dst_city = step_context.result # destination
         
+        # Sending the previous step log to the telemetry
+        bot_log = BookingDialog().generate_step_log(
+            self.destination_step_message,
+            booking_details.dst_city,
+            "destination_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")
+
         if booking_details.or_city is None: # origin
             retry_prompt = "Sorry, I couldn't find this place. Please enter a valid place."
             return await step_context.prompt(
                 "or_city",
                 PromptOptions(
-                    prompt=MessageFactory.text("From what city will you be travelling?"),
+                    prompt=MessageFactory.text(self.origin_step_message),
                     retry_prompt=MessageFactory.text(retry_prompt)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
@@ -125,6 +148,15 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.or_city = step_context.result # origin
+        
+        # Sending the previous step log to the telemetry
+        bot_log = BookingDialog().generate_step_log(
+            self.origin_step_message,
+            booking_details.or_city,
+            "origin_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")
+        
         if not booking_details.str_date or self.is_ambiguous(
             booking_details.str_date # travel_date
         ):
@@ -145,7 +177,16 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.str_date = step_context.result
-        print(booking_details.str_date)
+        
+        # Sending the previous step log to the telemetry
+        date_step_message = "On what date would you like to travel?"
+        bot_log = BookingDialog().generate_step_log(
+            date_step_message,
+            booking_details.str_date,
+            "travel_date_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")
+        
         if not booking_details.end_date or self.is_ambiguous(
             booking_details.end_date
         ):
@@ -155,31 +196,54 @@ class BookingDialog(CancelAndHelpDialog):
             
         return await step_context.next(booking_details.end_date)
     
-    async def budget_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def budget_step(
+        self, step_context: WaterfallStepContext
+        ) -> DialogTurnResult:
         """Prompt for the budget."""
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
         booking_details.end_date = step_context.result
+        
+        # Sending the previous step log to the telemetry
+        travel_end_date_step_message = "On what date would you like to come back?"
+        bot_log = BookingDialog().generate_step_log(
+            travel_end_date_step_message,
+            booking_details.end_date,
+            "travel_end_date_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")
+                
         if booking_details.budget is None:
             retry_prompt = """Sorry, I couldn't process your budget input. Try
             in a different way. Eg. 'I have a budget of 500$.'."""
             return await step_context.prompt(
                 "budget",
                 PromptOptions(
-                    prompt=MessageFactory.text("What is your budget?"),
+                    prompt=MessageFactory.text(self.budget_step_message),
                     retry_prompt=MessageFactory.text(retry_prompt)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
         return await step_context.next(booking_details.budget)   
     
-    async def n_adults_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def n_adults_step(
+        self, step_context: WaterfallStepContext
+        ) -> DialogTurnResult:
         """Prompt for the budget."""
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
         booking_details.budget = step_context.result
+        
+        # Sending the previous step log to the telemetry
+        bot_log = BookingDialog().generate_step_log(
+            self.budget_step_message,
+            booking_details.budget,
+            "budget_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")
+        
         if booking_details.n_adults is None:
             reprompt_msg = """Please include a numerical reference in your
             sentence.
@@ -188,20 +252,30 @@ class BookingDialog(CancelAndHelpDialog):
             return await step_context.prompt(
                 NumberPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("For how many adult(s)?"),
+                    prompt=MessageFactory.text(self.n_adults_step_message),
                     retry_prompt=MessageFactory.text(reprompt_msg)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
 
         return await step_context.next(booking_details.n_adults)      
     
-    async def n_children_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def n_children_step(
+        self, step_context: WaterfallStepContext
+        ) -> DialogTurnResult:
         """Prompt for the budget."""
         booking_details = step_context.options
 
         # Capture the response to the previous step's prompt
         booking_details.n_adults = step_context.result
-        
+
+        # Sending the previous step log to the telemetry
+        bot_log = BookingDialog().generate_step_log(
+            self.n_adults_step_message,
+            str(booking_details.n_adults),
+            "n_adults_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")
+
         if booking_details.n_children is None:
             reprompt_msg = """Please include a numerical reference in your
             sentence.
@@ -210,7 +284,7 @@ class BookingDialog(CancelAndHelpDialog):
             return await step_context.prompt(
                 NumberPrompt.__name__,
                 PromptOptions(
-                    prompt=MessageFactory.text("And how many child(ren)?"),
+                    prompt=MessageFactory.text(self.n_children_step_message),
                     retry_prompt=MessageFactory.text(reprompt_msg)
                 ),
             )  # pylint: disable=line-too-long,bad-continuation
@@ -225,6 +299,15 @@ class BookingDialog(CancelAndHelpDialog):
 
         # Capture the results of the previous step
         booking_details.n_children = step_context.result
+        
+        # Sending the previous step log to the telemetry
+        bot_log = BookingDialog().generate_step_log(
+            self.n_children_step_message,
+            str(booking_details.n_children),
+            "n_children_step"
+        )
+        self.telemetry_client.track_trace("Info", bot_log, "INFO")      
+        
         msg = (f"Just confirming, you are traveling from {booking_details.or_city} to {booking_details.dst_city} "
                f"from {booking_details.str_date} to {booking_details.end_date} with {booking_details.n_adults} adult(s) "
                f"and {booking_details.n_children} child(ren), and a budget of {booking_details.budget}. Does this sound correct?"
@@ -244,7 +327,9 @@ class BookingDialog(CancelAndHelpDialog):
 
     #     return await step_context.end_dialog()
     
-    async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def final_step(
+        self, step_context: WaterfallStepContext
+        ) -> DialogTurnResult:
         """Complete the interaction and end the dialog."""
         booking_details = step_context.options
         properties = {

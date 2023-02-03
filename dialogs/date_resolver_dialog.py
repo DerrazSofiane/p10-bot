@@ -3,7 +3,6 @@
 """Handle date/time resolution for booking dialog."""
 
 from datatypes_date_time.timex import Timex
-from typing import Final
 
 from botbuilder.core import MessageFactory, BotTelemetryClient, NullTelemetryClient
 from botbuilder.dialogs import WaterfallDialog, DialogTurnResult, WaterfallStepContext
