@@ -40,7 +40,7 @@ class BotTest(aiounittest.AsyncTestCase):
         return adapter
 
     async def test_complete_waterfall_dialog(self):
-        adapter = self.setup_booking_dialogs(BookingDialog.__name__, BookingDetails())
+        adapter = self.init_booking_dialogs(BookingDialog.__name__, BookingDetails())
         
         disc1 = await adapter.test(
             "Hi! I would like to book a flight", # User
@@ -86,7 +86,7 @@ class BotTest(aiounittest.AsyncTestCase):
             ) # Bot
 
     async def test_flight_booking_missing_informations(self):
-        adapter = self.setup_booking_dialogs(MainDialog.__name__)
+        adapter = self.init_booking_dialogs(MainDialog.__name__)
         
         disc1 = await adapter.test(
             "Hey!", # User
@@ -109,7 +109,7 @@ class BotTest(aiounittest.AsyncTestCase):
             ) # Bot
         
     async def test_bot_help(self):
-        adapter = self.setup_booking_dialogs(MainDialog.__name__)
+        adapter = self.init_booking_dialogs(MainDialog.__name__)
         
         disc1 = await adapter.test(
             "Hey!", # User
