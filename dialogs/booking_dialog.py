@@ -234,7 +234,16 @@ class BookingDialog(CancelAndHelpDialog):
         return await step_context.prompt(
             ConfirmPrompt.__name__, PromptOptions(prompt=MessageFactory.text(msg))
         )
+        
+    # async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    #     """Complete the interaction and end the dialog."""
+    #     if step_context.result:
+    #         booking_details = step_context.options
+    #     ### Flyme : End - Fin des modifications d'appel de méthodes
+    #         return await step_context.end_dialog(booking_details)
 
+    #     return await step_context.end_dialog()
+    
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """Complete the interaction and end the dialog."""
         booking_details = step_context.options
@@ -247,27 +256,17 @@ class BookingDialog(CancelAndHelpDialog):
             "n_adults": str(booking_details.n_adults),
             "n_children": str(booking_details.n_children)
         }
-        print(properties)
 
         if step_context.result:
-            self.telemetry_client.track_trace("Booking confirmed", properties, "INFO")
+            self.telemetry_client.track_trace("Success", properties, "INFO")
             return await step_context.end_dialog(booking_details)
 
-        self.telemetry_client.track_trace("Booking declined", properties, "ERROR")
+        self.telemetry_client.track_trace("Fail", properties, "ERROR")
         await step_context.context.send_activity(
-            MessageFactory.text("I invite you to make a new booking.")
+            MessageFactory.text("Please consider making a new booking.")
         )
 
         return await step_context.end_dialog()
-
-    # async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-    #     """Complete the interaction and end the dialog."""
-    #     if step_context.result:
-    #         booking_details = step_context.options
-    #     ### Flyme : End - Fin des modifications d'appel de méthodes
-    #         return await step_context.end_dialog(booking_details)
-
-    #     return await step_context.end_dialog()
 
     def is_ambiguous(self, timex: str) -> bool:
         """Ensure time is correct."""

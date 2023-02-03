@@ -1,10 +1,9 @@
-from botbuilder.dialogs.prompts import Prompt, PromptOptions, TextPrompt, PromptRecognizerResult
+from botbuilder.dialogs.prompts import Prompt, PromptOptions, PromptRecognizerResult
 from botbuilder.core.turn_context import TurnContext
 from botbuilder.schema import ActivityTypes
 
 from flight_booking_recognizer import FlightBookingRecognizer
 from config import DefaultConfig
-from helpers.luis_helper import LuisHelper, Intent
 
 from typing import Dict
 
